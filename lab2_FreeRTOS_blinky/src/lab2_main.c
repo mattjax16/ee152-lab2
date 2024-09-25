@@ -31,7 +31,8 @@ void task_blink_red( void * pvParameters )
 	    // We want to us osDelay() 
     }
 
-    // From 
+    // From  the video (just terminates task if some how loop exits and is good practice in every thread function)
+    osThreadTerminate(NULL);
 
 }
 
