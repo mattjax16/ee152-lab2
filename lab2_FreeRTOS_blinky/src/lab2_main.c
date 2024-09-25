@@ -1,3 +1,11 @@
+/**
+ * Yall Here is a good video series that helps a ton
+ * 
+ * https://www.youtube.com/watch?v=OPrcpbKNSjU (this is oart 3 but if you want can start with part 1)
+ * 
+ */
+
+
 // Include FreeRTOS headers.
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
@@ -16,12 +24,15 @@ void task_blink_red( void * pvParameters )
     // Hook up the red LED to Nano D12.
     pinMode(D12, "OUTPUT");
 
-    write this code
+    // write this code
 
     for ( ;; ) {
 	if (do_blink_red) {
-	    stuff...
+	    // We want to us osDelay() 
     }
+
+    // From 
+
 }
 
 // Keep blinking as long as do_blink_grn==true.
@@ -31,7 +42,7 @@ void task_blink_grn( void * pvParameters )
     // The green LED is at Nano D13, or PB3.
     pinMode(D13, "OUTPUT");
 
-    write this similarly...
+  
 }
 
 // This task keeps reading the UART forever. It sets the globals
