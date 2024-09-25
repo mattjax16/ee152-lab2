@@ -34,6 +34,7 @@ void delay(unsigned long ms);	// From the Arduino API.
 //	- PA5/A4 (DAC2) is tied to PB7/D4 via SB18
 void pinMode (enum Pin pin, char *mode);
 void digitalWrite (enum Pin pin, bool value);
+void digitalToggle (enum Pin pin);
 bool digitalRead  (enum Pin pin);
 
 // Analog base routines. Used by the ADC drivers in ADC_DAC.c.

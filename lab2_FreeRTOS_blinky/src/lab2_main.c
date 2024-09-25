@@ -27,8 +27,10 @@ void task_blink_red( void * pvParameters )
     // write this code
 
     for ( ;; ) {
-	if (do_blink_red) {
-	    // We want to us osDelay() 
+        if (do_blink_red) {
+            digitalToggle(D12);
+            vTaskDelay(BLINK_RED_DELAY); 
+        }
     }
 
     // From  the video (just terminates task if some how loop exits and is good practice in every thread function)
@@ -40,8 +42,27 @@ void task_blink_red( void * pvParameters )
 #define BLINK_GRN_DELAY ( 500 / portTICK_PERIOD_MS )
 void task_blink_grn( void * pvParameters )
 {
+
+    // vTaskSetApplicationTaskTag (NULL, (void *)1);
+
     // The green LED is at Nano D13, or PB3.
     pinMode(D13, "OUTPUT");
+
+
+    // write this code
+
+    for ( ;; ) {
+        if (do_blink_grn) {
+            digitalWrite (D13, 1);
+            vTaskDelay (BLINK_GRN_DELAY);
+            digitalWrite (D13, 0);
+            vTaskDelay (BLINK_GRN_DELAY); 
+        }
+    }
+
+    // From  the video (just terminates task if some how loop exits and is good practice in every thread function)
+    vTaskDelay(0);
+    // osThreadTerminate(NULL);
 
   
 }
@@ -71,26 +92,29 @@ int main()
     //clock_setup_16MHz();		// 16 MHz
     clock_setup_80MHz();		// 80 MHz
     serial_begin (USART2);
+    serial_write (USART2, "In main()\r\n");
 
     // Create tasks.
-    TaskHandle_t task_handle_uart = NULL;
-    BaseType_t OK = xTaskCreate (
-	    task_uart,
-	    "Decide which LEDs to blink",
-	    100, // stack size in words
-	    NULL, // parameter passed into task, e.g. "(void *) 1"
-	    tskIDLE_PRIORITY+1, // priority
-	    &task_handle_uart);
-    if (OK != pdPASS) for ( ;; );
+    // TaskHandle_t task_handle_uart = NULL;
+    // BaseType_t OK = xTaskCreate (
+	//     task_uart,
+	//     "Decide which LEDs to blink",
+	//     100, // stack size in words
+	//     NULL, // parameter passed into task, e.g. "(void *) 1"
+	//     tskIDLE_PRIORITY+1, // priority
+	//     &task_handle_uart);
+    // if (OK != pdPASS) for ( ;; );
 
     TaskHandle_t task_handle_red = NULL;
-    ... create task_blink_red ...
-    OK = xTaskCreate ( ... );
+    // ... create task_blink_red ...
+    BaseType_t OK = xTaskCreate ( task_blink_red, "Blink Red LED", 100,NULL,tskIDLE_PRIORITY,&task_handle_red);
     if (OK != pdPASS) for ( ;; );
 
     TaskHandle_t task_handle_grn = NULL;
-    ... create task_blink_red ...
-    OK = xTaskCreate ( ... );
+    // ... create task_blink_red ...
+    // OK = xTaskCreate ( ... );
+    // if (OK != pdPASS) for ( ;; );
+    OK = xTaskCreate ( task_blink_grn, "Blink GRN LED", 100,NULL,tskIDLE_PRIORITY,&task_handle_grn);
     if (OK != pdPASS) for ( ;; );
 
     vTaskStartScheduler();

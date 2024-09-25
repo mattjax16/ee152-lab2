@@ -208,9 +208,15 @@ void digitalWrite (enum Pin pin, bool value) {
     uint32_t shft = 1<<g_GPIO_pin[pin];
     GPIO_TypeDef *gpio = g_GPIO_port[pin];
     if (value)
-	gpio->ODR |= shft;
+	gpio->ODR ^= shft;
     else
 	gpio->ODR &= ~shft;
+}
+
+void digitalToggle (enum Pin pin) {
+    uint32_t shft = 1<<g_GPIO_pin[pin];
+    GPIO_TypeDef *gpio = g_GPIO_port[pin];
+	gpio->ODR |= shft;
 }
 #endif
 
