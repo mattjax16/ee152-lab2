@@ -37,6 +37,7 @@ void digitalWrite (enum Pin pin, bool value);
 void digitalToggle (enum Pin pin);
 bool digitalRead  (enum Pin pin);
 
+
 // Analog base routines. Used by the ADC drivers in ADC_DAC.c.
 void GPIO_set_analog_in (GPIO_TypeDef *gpio,unsigned int pin);
 

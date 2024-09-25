@@ -28,7 +28,7 @@ void task_blink_red( void * pvParameters )
 
     for ( ;; ) {
         if (do_blink_red) {
-            digitalToggle(D12);
+            toggle_red_LED();
             vTaskDelay(BLINK_RED_DELAY); 
         }
     }
@@ -43,8 +43,6 @@ void task_blink_red( void * pvParameters )
 void task_blink_grn( void * pvParameters )
 {
 
-    // vTaskSetApplicationTaskTag (NULL, (void *)1);
-
     // The green LED is at Nano D13, or PB3.
     pinMode(D13, "OUTPUT");
 
@@ -53,10 +51,14 @@ void task_blink_grn( void * pvParameters )
 
     for ( ;; ) {
         if (do_blink_grn) {
-            digitalWrite (D13, 1);
+            // serial_write(USART2, "green on");
+            // digitalWrite (D13, 1);
+            // vTaskDelay (BLINK_GRN_DELAY);
+            // serial_write(USART2, "green off");
+            // digitalWrite (D13, 0);
+            // vTaskDelay (BLINK_GRN_DELAY); 
+            toggle_grn_LED();
             vTaskDelay (BLINK_GRN_DELAY);
-            digitalWrite (D13, 0);
-            vTaskDelay (BLINK_GRN_DELAY); 
         }
     }
 

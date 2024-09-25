@@ -145,6 +145,10 @@ void toggle_grn_LED (void) {
     GPIOB->ODR ^= GPIO_ODR_ODR_3;
 }
 
+void toggle_red_LED (void) {
+    GPIOB->ODR ^= GPIO_ODR_ODR_4;
+}
+
 // Set a given GPIO pin to be 1 or 0.
 void set_GPIO_pin (GPIO_TypeDef *gpio, int pin, int val) {
     uint32_t shft = 1<<pin;
