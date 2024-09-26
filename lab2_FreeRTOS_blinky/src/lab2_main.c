@@ -17,6 +17,7 @@
 
 bool do_blink_red = 1, do_blink_grn = 1;
 bool blink_alt = 0;
+int mode = 0;
 
 #define BLINK_RED_DELAY (500 / portTICK_PERIOD_MS)
 // Keep blinking as long as do_blink_red==true.
@@ -30,7 +31,7 @@ void task_blink_red(void *pvParameters) {
 
   for (;;) {
     if (do_blink_red) {
-      int mode = *(int*)pvParameters;   // casting void pointer as int type, setting to 
+      // int mode = *(int)*pvParameters;   // casting void pointer as int type, setting to 
       
       switch (mode)
       {
@@ -70,8 +71,13 @@ void task_blink_grn(void *pvParameters) {
   // write this code
   const int cycle_time = 1000; // 1000ms = 1 second
   const int green_half_period = cycle_time / 6; // ~167ms (3 cycles per second)
+  // int mode = *(int*)pvParameters;
+  
+
+  
   
   for (;;) {
+
     if (do_blink_grn) {
       // serial_write(USART2, "green on");
       // digitalWrite (D13, 1);
@@ -79,11 +85,11 @@ void task_blink_grn(void *pvParameters) {
       // serial_write(USART2, "green off");
       // digitalWrite (D13, 0);
       // vTaskDelay (BLINK_GRN_DELAY);
-      int mode = *(int*)pvParameters;   // casting void pointer as int type, setting to 
+      // int mode = *(int*)pvParameters;   // casting void pointer as int type, setting to 
       // Debugging
-      char mode_str[50];
-      sprintf(mode_str, "Green mode value: %d\n", mode);
-      serial_write(USART2, mode_str);
+      // char mode_str[50];
+      // sprintf(mode_str, "Green mode value: %d\n", mode);
+      // serial_write(USART2, mode_str);
       
       switch (mode)
       {
@@ -95,6 +101,7 @@ void task_blink_grn(void *pvParameters) {
       case 1:
         // Alternate case
         digitalWrite(D13, blink_alt);
+        blink_alt = !blink_alt;
         vTaskDelay(BLINK_GRN_DELAY);
         break;
       case 2:
@@ -141,7 +148,7 @@ int main() {
   // clock_setup_16MHz();		// 16 MHz
   clock_setup_80MHz(); // 80 MHz
   serial_begin(USART2);
-  serial_write(USART2, "In main()\r\n");
+  serial_write(USART2, "In main()\r\n"); // TODO why doesnt this shit print
 
   // Create tasks.
   /* COMMENT BACK IN FOR UART
@@ -158,9 +165,11 @@ int main() {
   */
 
   TaskHandle_t task_handle_red = NULL;
-  const int mode_int = 0;
+  // TODO: Ask why are parameter passing isnt working ie *(int*)pvParameters
+  // const int mode_int = 0;
   // ... create task_blink_red ...
-  BaseType_t OK = xTaskCreate(task_blink_red, "Blink Red LED", 100, (void*)&mode_int, tskIDLE_PRIORITY, &task_handle_red);
+  // BaseType_t OK = xTaskCreate(task_blink_red, "Blink Red LED", 100, (void*)&mode_int, tskIDLE_PRIORITY, &task_handle_red);
+  BaseType_t OK = xTaskCreate(task_blink_red, "Blink Red LED", 100, NULL, tskIDLE_PRIORITY, &task_handle_red);
   if (OK != pdPASS)
     for (;;)
       ;
@@ -169,7 +178,7 @@ int main() {
   // ... create task_blink_red ...
   // OK = xTaskCreate ( ... );
   // if (OK != pdPASS) for ( ;; );
-  OK = xTaskCreate(task_blink_grn, "Blink GRN LED", 100, (void*)&mode_int, tskIDLE_PRIORITY,
+  OK = xTaskCreate(task_blink_grn, "Blink GRN LED", 100, NULL , tskIDLE_PRIORITY,
                    &task_handle_grn);
   if (OK != pdPASS)
     for (;;)
