@@ -17,7 +17,7 @@
 
 bool do_blink_red = 1, do_blink_grn = 1;
 bool blink_alt = 0;
-int mode = 0;
+int mode = 1;
 
 #define BLINK_RED_DELAY (500 / portTICK_PERIOD_MS)
 // Keep blinking as long as do_blink_red==true.
@@ -31,7 +31,7 @@ void task_blink_red(void *pvParameters) {
 
   for (;;) {
     if (do_blink_red) {
-      // int mode = *(int)*pvParameters;   // casting void pointer as int type, setting to 
+      // int mode = *((int*)pvParameters);   // casting void pointer as int type, setting to 
       
       switch (mode)
       {
@@ -54,11 +54,10 @@ void task_blink_red(void *pvParameters) {
         break;
       }
     }
+    vTaskDelay(1);
+    // osThreadTerminate(NULL);
   }
-
-  // From  the video (just terminates task if some how loop exits and is good
-  // practice in every thread function)
-  osThreadTerminate(NULL);
+  // vTaskDelay(1);
 }
 
 // Keep blinking as long as do_blink_grn==true.
@@ -71,9 +70,8 @@ void task_blink_grn(void *pvParameters) {
   // write this code
   const int cycle_time = 1000; // 1000ms = 1 second
   const int green_half_period = cycle_time / 6; // ~167ms (3 cycles per second)
+  // TODO why doesnt this work ie pvParameters
   // int mode = *(int*)pvParameters;
-  
-
   
   
   for (;;) {
@@ -100,7 +98,7 @@ void task_blink_grn(void *pvParameters) {
         break;
       case 1:
         // Alternate case
-        digitalWrite(D13, blink_alt);
+        digitalWrite(D13, !blink_alt);
         blink_alt = !blink_alt;
         vTaskDelay(BLINK_GRN_DELAY);
         break;
@@ -114,12 +112,8 @@ void task_blink_grn(void *pvParameters) {
       }
       
     }
+    vTaskDelay(1);
   }
-
-  // From  the video (just terminates task if some how loop exits and is good
-  // practice in every thread function)
-  vTaskDelay(0);
-  // osThreadTerminate(NULL);
 }
 
 // This task keeps reading the UART forever. It sets the globals
@@ -148,28 +142,28 @@ int main() {
   // clock_setup_16MHz();		// 16 MHz
   clock_setup_80MHz(); // 80 MHz
   serial_begin(USART2);
-  serial_write(USART2, "In main()\r\n"); // TODO why doesnt this shit print
+  serial_write(USART2, "In main()\r\n"); 
 
   // Create tasks.
-  /* COMMENT BACK IN FOR UART
-  TaskHandle_t task_handle_uart = NULL;
-  BaseType_t OK =
-      xTaskCreate(task_uart, "Decide which LEDs to blink",
-                  100,  // stack size in words
-                  NULL, // parameter passed into task, e.g. "(void *) 1"
-                  // tskIDLE_PRIORITY+1, // priority
-                  tskIDLE_PRIORITY, &task_handle_uart);
-  if (OK != pdPASS)
-    for (;;)
-      ;
-  */
+ 
+  // TaskHandle_t task_handle_uart = NULL;
+  // BaseType_t OK =
+  //     xTaskCreate(task_uart, "Decide which LEDs to blink",
+  //                 100,  // stack size in words
+  //                 NULL, // parameter passed into task, e.g. "(void *) 1"
+  //                 tskIDLE_PRIORITY, // priority
+  //                 &task_handle_uart);
+  // if (OK != pdPASS)
+  //   for (;;)
+  //     ;
+
 
   TaskHandle_t task_handle_red = NULL;
   // TODO: Ask why are parameter passing isnt working ie *(int*)pvParameters
   // const int mode_int = 0;
   // ... create task_blink_red ...
   // BaseType_t OK = xTaskCreate(task_blink_red, "Blink Red LED", 100, (void*)&mode_int, tskIDLE_PRIORITY, &task_handle_red);
-  BaseType_t OK = xTaskCreate(task_blink_red, "Blink Red LED", 100, NULL, tskIDLE_PRIORITY, &task_handle_red);
+  BaseType_t OK = xTaskCreate(task_blink_red, "Blink Red LED", 100, NULL, tskIDLE_PRIORITY+1, &task_handle_red);
   if (OK != pdPASS)
     for (;;)
       ;
@@ -178,7 +172,7 @@ int main() {
   // ... create task_blink_red ...
   // OK = xTaskCreate ( ... );
   // if (OK != pdPASS) for ( ;; );
-  OK = xTaskCreate(task_blink_grn, "Blink GRN LED", 100, NULL , tskIDLE_PRIORITY,
+  OK = xTaskCreate(task_blink_grn, "Blink GRN LED", 100, NULL , tskIDLE_PRIORITY+1,
                    &task_handle_grn);
   if (OK != pdPASS)
     for (;;)
